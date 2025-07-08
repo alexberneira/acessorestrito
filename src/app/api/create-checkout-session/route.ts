@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 export async function POST(request: Request) {
+  console.log('API route chamada');
+  console.log('Variáveis de ambiente:', {
+    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
+    hasBaseUrl: !!process.env.NEXT_PUBLIC_BASE_URL,
+    stripeKeyLength: process.env.STRIPE_SECRET_KEY?.length || 0
+  });
+
   if (!process.env.STRIPE_SECRET_KEY) {
     console.error('STRIPE_SECRET_KEY não está configurada');
     return NextResponse.json(
@@ -13,8 +20,11 @@ export async function POST(request: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2025-06-30.basil',
   });
+
   try {
-    const { email, name } = await request.json();
+    const body = await request.json();
+    console.log('Dados recebidos:', { email: body.email, name: body.name });
+    const { email, name } = body;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
