@@ -2,26 +2,28 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
 export async function POST(request: Request) {
-  console.log('API route chamada');
-  console.log('Variáveis de ambiente:', {
-    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
-    hasBaseUrl: !!process.env.NEXT_PUBLIC_BASE_URL,
-    stripeKeyLength: process.env.STRIPE_SECRET_KEY?.length || 0
-  });
-
-  if (!process.env.STRIPE_SECRET_KEY) {
-    console.error('STRIPE_SECRET_KEY não está configurada');
-    return NextResponse.json(
-      { error: 'Configuração do Stripe não encontrada' },
-      { status: 500 }
-    );
-  }
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-06-30.basil',
-  });
-
   try {
+    console.log('API route chamada');
+    
+    // Verificar variáveis de ambiente
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('STRIPE_SECRET_KEY não está configurada');
+      return NextResponse.json(
+        { error: 'STRIPE_SECRET_KEY não configurada' },
+        { status: 500 }
+      );
+    }
+
+    console.log('Stripe key encontrada, comprimento:', process.env.STRIPE_SECRET_KEY.length);
+
+    // Tentar criar instância do Stripe
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-06-30.basil',
+    });
+
+    console.log('Instância do Stripe criada com sucesso');
+
+    // Ler dados do request
     const body = await request.json();
     console.log('Dados recebidos:', { email: body.email, name: body.name });
     const { email, name } = body;
