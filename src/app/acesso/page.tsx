@@ -54,8 +54,7 @@ export default function AcessoPrivado() {
         {/* Rodapé */}
         <div className="mt-8 pt-4 border-t border-gray-700/50">
           <p className="text-xs text-gray-500 text-center leading-relaxed">
-            Este é um conteúdo digital e exclusivo para maiores de 18 anos. 
-            Pagamento processado com segurança pela Stripe.
+            Este é um conteúdo digital. Pagamento processado com segurança pela Stripe.
           </p>
         </div>
       </div>
