@@ -17,9 +17,7 @@ export async function POST(request: Request) {
     console.log('Stripe key encontrada, comprimento:', process.env.STRIPE_SECRET_KEY.length);
 
     // Tentar criar instância do Stripe
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-06-30.basil',
-    });
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     console.log('Instância do Stripe criada com sucesso');
 
@@ -28,6 +26,8 @@ export async function POST(request: Request) {
     console.log('Dados recebidos:', { email: body.email, name: body.name });
     const { email, name } = body;
 
+    console.log('Tentando criar sessão do Stripe...');
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: email,
@@ -45,14 +45,15 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/pago?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}?canceled=true`,
+      success_url: `https://${process.env.NEXT_PUBLIC_BASE_URL}/pago?success=true`,
+      cancel_url: `https://${process.env.NEXT_PUBLIC_BASE_URL}?canceled=true`,
       metadata: {
         customer_name: name,
         customer_email: email,
       },
     });
 
+    console.log('Sessão criada com sucesso:', session.id);
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
     console.error('Erro ao criar sessão de checkout:', error);
